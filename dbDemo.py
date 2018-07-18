@@ -42,6 +42,7 @@ if not os.path.exists("dbDemo.db"): #cannot find file dbDemo.db
 userInput=""
 while userInput!="Q":
     userInput=input("Enter R to display Data or I to insert Data or D to delete Data or Q to quit")
+    userInput = userInput.upper()
 
     if userInput=="R":
         readData()
@@ -50,7 +51,7 @@ while userInput!="Q":
         name=input("Enter the name of travel package:")
         country=input("Enter the Country:")
         insertData(name,country)
-    
+
     elif userInput=="D":
         name=input("Enter the name of tour package to Delete")
         deleteData(name)
