@@ -2,8 +2,12 @@ import tkinter as tk
 import tkinter.ttk as ttk
 from tkinter import StringVar
 from tkinter import messagebox
+### SQL ###
+import sqlite3
+import os.path
+### SQL ###
 
-fileName="tourlist.txt"
+fileName= "sp_Travel_Admin_Database.db"
 listOfTourPackages=[]
 
 class TourPackage:
@@ -38,26 +42,18 @@ class TourPackage:
 
 #load data from some supplied filename
 def loadData(fileName):
-	#Load Data to GUI
-	file=open(fileName,'r')
-	lines=file.readlines()
-	tourLists=[]
+    db=sqlite3.connect(fileName)
+    sql="select * from travel"
+    db.row_factory = sqlite3.Row
+    rows=db.execute(sql)
+    tourLists = []
 
-	for eachLine in lines:
-		eachLine=eachLine.replace("\n","")
-		cols=eachLine.split("|")
-		name=cols[0]
-		destination=cols[1]
-		duration=cols[2]
-		period=cols[3]
-		price=float(cols[4])
-		tourlist=TourPackage(name,destination,duration,period,price)
-		tourLists.append(tourlist)
-	
-	file.close()
+    for data in rows:
+        tourlist = TourPackage(data['name'],data['destination'],data['duration'],data['period'],float(data['price']))
+        tourLists.append(tourlist)
+    db.close()
 
-
-	return tourLists
+    return tourLists
 
 #update Tree View of travel package info
 def updateTreeView():
@@ -82,7 +78,7 @@ def reloadData():
 
 #search and filter matching tours
 def filterTour():
-	
+
 	#clear treeview items
 	for i in tree1.get_children():
 		tree1.delete(i)
@@ -92,13 +88,13 @@ def filterTour():
 	#print(searchStr)
 
 	for tp in listOfTourPackages:
-		#match substring 
+		#match substring
 		if tp.getName().upper().find(searchStr)>-1:
 			#bind the iid with the List item index
 			tree1.insert("",i,text=tp.getName(),iid=str(i))
-		
+
 		i+=1
-		
+
 	clearTextBoxes()
 
 def clearTextBoxes():
@@ -109,9 +105,9 @@ def clearTextBoxes():
 	txtPrice.set("")
 
 def selectItem(e):
-	
+
 	curItem = tree1.selection()
-	print(curItem[0]) #get the iid 
+	print(curItem[0]) #get the iid
 	iid=int(curItem[0])
 	print(listOfTourPackages[iid].getName())
 
@@ -121,8 +117,8 @@ def selectItem(e):
 	txtPrice.set("$"+str(listOfTourPackages[iid].getPriceWithGST()))
 
 
-#Main GUI	
-window = tk.Tk() 
+#Main GUI
+window = tk.Tk()
 window.title("SP Travel")
 window.geometry("500x500") #You want the size of the app to be 500x500
 window.resizable(0, 0) #Don't allow resizing in the x or y direction
