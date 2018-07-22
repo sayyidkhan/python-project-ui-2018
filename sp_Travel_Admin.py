@@ -37,7 +37,7 @@ def deleteData(name):
 
 
 #create a database when it does not exist
-if not os.path.exists('sp_Travel_Admin_Database.db'): #cannot find file dbDemo.db
+if not os.path.exists('sp_Travel_Admin_Database.db'): #cannot find file sp_Travel_Admin_Database.db
     initDatabase()
 
 
