@@ -9,13 +9,69 @@ import sqlite3
 import os.path
 ### SQL ###
 
+fileName_txt ="tourlist.txt"
+listOfTourPackages=[]
+
+class TourPackage:
+    def __init__(self,name,destination,duration,period,price):
+        self.__name=name
+        self.__destination=destination
+        self.__duration=duration
+        self.__period=period
+        self.__price=price
+    def getName(self):
+        return self.__name
+    def setName(self,name):
+        self.__name=name
+    def getDestination(self):
+        return self.__destination
+    def setDestination(self,destination):
+        self.__destination=destination
+    def getDuration(self):
+        return self.__duration
+    def setDuration(self,duration):
+        self.__duration=duration
+    def getPeriod(self):
+        return self.__period
+    def setPeriod(self,period):
+        self.__period=period
+    def getPrice(self):
+        return self.__price
+    def setPrice(self,price):
+        self.__price = price
+    def getPriceWithGST(self):
+        return(self.__price * 1.07)
+
+#load data from some supplied filename
+def loadData(fileName):
+	#Load Data to GUI
+	file=open(fileName_txt,'r')
+	lines=file.readlines()
+	tourLists=[]
+	for eachLine in lines:
+		eachLine=eachLine.replace("\n","")
+		cols=eachLine.split("|")
+		name=cols[0]
+		destination=cols[1]
+		duration=cols[2]
+		period=cols[3]
+		price=cols[4]
+		tourlist=TourPackage(name,destination,duration,period,price)
+		tourLists.append(tourlist)
+	file.close()
+	return tourLists
+
+#load text file data and get the list Of TourPackages
+listOfTourPackages=loadData(fileName_txt)
+
 ### SQL Functions ###
 def initDatabase():
     db=sqlite3.connect('sp_Travel_Admin_Database.db')
-    sql="create table travel(name text primary key,destination text,duration text,period text,price text)"
+    sql="create table travel(name text primary key,destination text,duration text,period text,price real)"
     db.execute(sql)
-    sql="insert into travel(name,destination,duration,period,price) values('Korea Ski-ing Winter Tour','Korea','5D4N','01 January 2017 to 20 May 2018','999')"
-    db.execute(sql)
+    for tp in listOfTourPackages:
+        sql="insert into travel(name,destination,duration,period,price) values('"+tp.getName()+"','"+tp.getDestination()+"','"+tp.getDuration()+"','"+tp.getPeriod()+"','"+tp.getPrice()+"')"
+        db.execute(sql)
     db.commit()
     db.close()
     messagebox.showinfo("DataBase Update - Success","Database initialized")
