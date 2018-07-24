@@ -40,16 +40,6 @@ class TourPackage:
     def getPriceWithGST(self):
         return(self.__price*1.07)
 
-def initDatabase():
-    db=sqlite3.connect('sp_Travel_Admin_Database.db')
-    sql="create table travel(name text primary key,destination text,duration text,period text,price text)"
-    db.execute(sql)
-    sql="insert into travel(name,destination,duration,period,price) values('Korea Ski-ing Winter Tour','Korea','5D4N','01 January 2017 to 20 May 2018','999')"
-    db.execute(sql)
-    db.commit()
-    db.close()
-    messagebox.showinfo("DataBase Update - Success","Database initialized")
-
 def loadData(fileName):
     db=sqlite3.connect(fileName)
     sql="select * from travel"
@@ -63,14 +53,6 @@ def loadData(fileName):
     db.close()
 
     return tourLists
-
-#create a database when it does not exist
-if not os.path.exists('sp_Travel_Admin_Database.db'): #cannot find file sp_Travel_Admin_Database.db
-    initDatabase()
-    loadData(fileName)
-else:
-    #load data from some supplied filename
-    loadData(fileName)
 
 #update Tree View of travel package info
 def updateTreeView():

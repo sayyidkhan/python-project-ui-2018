@@ -10,8 +10,9 @@ import os.path
 ### SQL ###
 
 fileName_txt ="tourlist.txt"
-listOfTourPackages=[]
 
+### Class TourPackage ###
+#########################
 class TourPackage:
     def __init__(self,name,destination,duration,period,price):
         self.__name=name
@@ -41,7 +42,11 @@ class TourPackage:
         self.__price = price
     def getPriceWithGST(self):
         return(self.__price * 1.07)
+#########################
+### Class TourPackage ###
 
+### load text file ###
+######################
 #load data from some supplied filename
 def loadData(fileName):
 	#Load Data to GUI
@@ -62,9 +67,12 @@ def loadData(fileName):
 	return tourLists
 
 #load text file data and get the list Of TourPackages
-listOfTourPackages=loadData(fileName_txt)
+listOfTourPackages = loadData(fileName_txt)
+######################
+### load text file ###
 
 ### SQL Functions ###
+#####################
 def initDatabase():
     db=sqlite3.connect('sp_Travel_Admin_Database.db')
     sql="create table travel(name text primary key,destination text,duration text,period text,price real)"
@@ -91,13 +99,29 @@ def deleteData(name):
     db.commit()
     db.close()
 
+#store all "package name" into an array, which will be used later to validate if "package name" contains in an array
+def checkData_WithName():
+    db=sqlite3.connect('sp_Travel_Admin_Database.db')
+    sql="select * from travel"
+    db.row_factory = sqlite3.Row
+    rows=db.execute(sql)
+    list_checkData_WithName = []
+    for data in rows:
+        list_checkData_WithName.append(data['name'])
+    db.close()
+    return list_checkData_WithName
+#####################
+### SQL Functions ###
 
-#create a database when it does not exist
+### create a database when it does not exist ###
+################################################
 if not os.path.exists('sp_Travel_Admin_Database.db'): #cannot find file sp_Travel_Admin_Database.db
     initDatabase()
-
+################################################
+### create a database when it does not exist ###
 
 ### GUI Functions ###
+#####################
 #insert_Button_message_box_info
 def insert_Button():
     name = txtName.get()
@@ -111,7 +135,7 @@ def insert_Button():
     else:
       messagebox.showinfo("DataBase Update - Failed","Incomplete Entry, Please complete all data entry")
 
-#insert_Button_message_box_info
+#delete_Button_message_box_info
 def delete_Button():
     name = txtName.get()
     txtName.set("")
@@ -119,14 +143,21 @@ def delete_Button():
     txtDuration.set("")
     txtPeriod.set("")
     txtPrice.set("")
-    if name != "":
+    my_list = checkData_WithName()
+    if name in my_list:
         deleteData(name)
-        messagebox.showinfo("DataBase Update - Success","Deleted Database Entry")
+        messagebox.showinfo("DataBase Update - Success",  name + ", have been successfully deleted")
     elif name == "":
-        messagebox.showinfo("DataBase Update - Failed","No data Entry entered, Please complete all data entry")
+        messagebox.showinfo("DataBase Update - Null","Incomplete entry, no data entered")
+    else:
+        print (name,"not in my list")
+        messagebox.showinfo("DataBase Update - Failed",  name + ", is not a valid entry in the database.")
 
+#####################
+### GUI Functions ###
 
 ### GUI ###
+###########
 window = tk.Tk()
 window.title("Sp Travel Admin")
 window.geometry("500x500") #You want the size of the app to be 500x500
@@ -179,6 +210,8 @@ button1.grid(row=7,column=1,columnspan=3,pady=10)
 ### Button Delete Data ###
 button2=ttk.Button(window,text='Delete',command= delete_Button)
 button2.grid(row=7,column=2,columnspan=3,pady=10)
+### GUI ###
+###########
 
 
 window.mainloop() #main loop to wait for events
