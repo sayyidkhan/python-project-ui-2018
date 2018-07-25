@@ -91,6 +91,13 @@ def insertData(name,destination,duration,period,price):
     db.commit()
     db.close()
 
+def updateData(name,destination,duration,period,price):
+    db=sqlite3.connect('sp_Travel_Admin_Database.db')
+    sql="update travel set name=?, destination=?, duration=?, period=?, price=? where name=?"
+    db.execute(sql,(name,destination,duration,period,price,name))
+    db.commit()
+    db.close()
+
 def deleteData(name):
     print("Delete...")
     db=sqlite3.connect('sp_Travel_Admin_Database.db')
@@ -108,6 +115,19 @@ def checkData_WithName():
     list_checkData_WithName = []
     for data in rows:
         list_checkData_WithName.append(data['name'])
+    db.close()
+    return list_checkData_WithName
+
+#
+def readData_allData():
+    db=sqlite3.connect('sp_Travel_Admin_Database.db')
+    sql="select * from travel"
+    db.row_factory = sqlite3.Row
+    rows=db.execute(sql)
+    list_checkData_WithName = []
+    for data in rows:
+        attributes = [data['name'],data['destination'],data['duration'],data['period'],data['price']]
+        list_checkData_WithName.append(attributes)
     db.close()
     return list_checkData_WithName
 #####################
@@ -153,6 +173,49 @@ def delete_Button():
         print (name,"not in my list")
         messagebox.showinfo("DataBase Update - Failed",  name + ", is not a valid entry in the database.")
 
+#search_Button: search for the package, and prints the package out
+def search_Button():
+    name = txtName.get()
+    my_list = checkData_WithName()
+    all_packages = readData_allData()
+    ### check if the name is in the database, check against all names ###
+    if name in my_list:
+        ### run a for loop to isolate the database down to a single array to validate ###
+        for package in all_packages:
+            ### if name in package, will print out the data ###
+            if name in package:
+                print(package)
+                txtName.set(package[0])
+                txtDestination.set(package[1])
+                txtDuration.set(package[2])
+                txtPeriod.set(package[3])
+                txtPrice.set(package[4])
+        messagebox.showinfo("DataBase Search - Success",  name + ", have been successfully displayed")
+    elif name == "":
+        messagebox.showinfo("DataBase Search - Null",  "no data selected")
+    else:
+        messagebox.showinfo("DataBase Search - Failed", name + ", is not available in the database")
+
+#update_Button: update the package, and prints the package out
+def update_Button():
+    name = txtName.get()
+    destination = txtDestination.get()
+    duration = txtDuration.get()
+    period = txtPeriod.get()
+    price = txtPrice.get()
+    if name != "" and destination != "" and duration != "" and period != "" and price != "":
+        updateData(name,destination,duration,period,price)
+        messagebox.showinfo("DataBase Update - Success",  name + ", have been successfully updated")
+    else:
+        messagebox.showinfo("DataBase Update - Failed",  "One of the fields are empty")
+
+#clear text in textboxes
+def clear_Button():
+    txtName.set("")
+    txtDestination.set("")
+    txtDuration.set("")
+    txtPeriod.set("")
+    txtPrice.set("")
 #####################
 ### GUI Functions ###
 
@@ -160,7 +223,7 @@ def delete_Button():
 ###########
 window = tk.Tk()
 window.title("Sp Travel Admin")
-window.geometry("500x500") #You want the size of the app to be 500x500
+window.geometry("550x550") #You want the size of the app to be 500x500
 window.resizable(0, 0) #Don't allow resizing in the x or y direction
 #
 ### label App Name ###
@@ -210,6 +273,15 @@ button1.grid(row=7,column=1,columnspan=3,pady=10)
 ### Button Delete Data ###
 button2=ttk.Button(window,text='Delete',command= delete_Button)
 button2.grid(row=7,column=2,columnspan=3,pady=10)
+### Button update Data ###
+button2=ttk.Button(window,text='Search',command= search_Button)
+button2.grid(row=8,column=1,columnspan=3,pady=10)
+### Button update Data ###
+button2=ttk.Button(window,text='Update',command= update_Button)
+button2.grid(row=8,column=2,columnspan=3,pady=10)
+### Button clear Data ###
+button2=ttk.Button(window,text='Clear',command= clear_Button)
+button2.grid(row=9,column=2,columnspan=3,pady=10)
 ### GUI ###
 ###########
 
