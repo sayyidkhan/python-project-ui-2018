@@ -10,12 +10,15 @@ import os.path
 fileName= "sp_Travel_Admin_Database.db"
 listOfTourPackages=[]
 
+## Class TourPackage ###
+#########################
 class TourPackage:
-    def __init__(self,name,destination,duration,period,price):
+    def __init__(self,name,destination,duration,startDate,endDate,price):
         self.__name=name
         self.__destination=destination
         self.__duration=duration
-        self.__period=period
+        self.__startDate=startDate
+        self.__endDate=endDate
         self.__price=price
     def getName(self):
         return self.__name
@@ -29,16 +32,22 @@ class TourPackage:
         return self.__duration
     def setDuration(self,duration):
         self.__duration=duration
-    def getPeriod(self):
-        return self.__period
-    def setPeriod(self,period):
-        self.__period=period
+    def getstartDate(self):
+        return self.__startDate
+    def setstartDate(self,startDate):
+        self.__startDate = startDate
+    def getendDate(self):
+        return self.__endDate
+    def setendDate(self,period):
+        self.__endDate = endDate
     def getPrice(self):
         return self.__price
     def setPrice(self,price):
-        self.__price=price
+        self.__price = price
     def getPriceWithGST(self):
-        return(self.__price*1.07)
+        return(self.__price * 1.07)
+#########################
+### Class TourPackage ###
 
 def loadData(fileName):
     db=sqlite3.connect(fileName)
@@ -48,7 +57,7 @@ def loadData(fileName):
     tourLists = []
 
     for data in rows:
-        tourlist = TourPackage(data['name'],data['destination'],data['duration'],data['period'],float(data['price']))
+        tourlist = TourPackage(data['name'],data['destination'],data['duration'],data['start_date'],data['end_date'],float(data['price']))
         tourLists.append(tourlist)
     db.close()
 
@@ -98,22 +107,24 @@ def filterTour():
 
 def clearTextBoxes():
 	#clear text in textboxes
-	txtDestination.set("")
-	txtDuration.set("")
-	txtPeriod.set("")
-	txtPrice.set("")
+    txtDestination.set("")
+    txtDuration.set("")
+    txtstartDate.set("")
+    txtendDate.set("")
+    txtPrice.set("")
 
 def selectItem(e):
 
-	curItem = tree1.selection()
-	print(curItem[0]) #get the iid
-	iid=int(curItem[0])
-	print(listOfTourPackages[iid].getName())
+  curItem = tree1.selection()
+  print(curItem[0]) #get the iid
+  iid=int(curItem[0])
+  print(listOfTourPackages[iid].getName())
 
-	txtDestination.set(listOfTourPackages[iid].getDestination())
-	txtDuration.set(listOfTourPackages[iid].getDuration())
-	txtPeriod.set(listOfTourPackages[iid].getPeriod())
-	txtPrice.set("$"+str(listOfTourPackages[iid].getPriceWithGST()))
+  txtDestination.set(listOfTourPackages[iid].getDestination())
+  txtDuration.set(listOfTourPackages[iid].getDuration())
+  txtstartDate.set(listOfTourPackages[iid].getstartDate())
+  txtendDate.set(listOfTourPackages[iid].getendDate())
+  txtPrice.set("$"+str(listOfTourPackages[iid].getPriceWithGST()))
 
 
 #Main GUI
@@ -152,20 +163,26 @@ txtDuration=StringVar()
 textDuration=ttk.Entry(window,textvariable=txtDuration,state='readonly')
 textDuration.grid(row=4,column=1,pady=2)
 
-labelDescription=ttk.Label(window,text="Period",padding=2)
-labelDescription.grid(row=5,column=0,sticky=tk.W)
-txtPeriod=StringVar()
-textPeriod=ttk.Entry(window,textvariable=txtPeriod,state='readonly',width=34)
-textPeriod.grid(row=5,column=1,columnspan=2,pady=2)
+labelstartDate=ttk.Label(window,text="Start Date",padding=2)
+labelstartDate.grid(row=5,column=0,sticky=tk.W)
+txtstartDate=StringVar()
+textstartDate=ttk.Entry(window,textvariable=txtstartDate,state='readonly',width=34)
+textstartDate.grid(row=5,column=1,columnspan=2,pady=2)
+
+labelendDate=ttk.Label(window,text="End Date",padding=2)
+labelendDate.grid(row=6,column=0,sticky=tk.W)
+txtendDate=StringVar()
+textendDate=ttk.Entry(window,textvariable=txtendDate,state='readonly',width=34)
+textendDate.grid(row=6,column=1,columnspan=2,pady=2)
 
 labelPrice=ttk.Label(window,text="Price(GST)",padding=2)
-labelPrice.grid(row=6,column=0,sticky=tk.W)
+labelPrice.grid(row=7,column=0,sticky=tk.W)
 txtPrice=StringVar()
 textPrice=ttk.Entry(window,textvariable=txtPrice,state='readonly')
-textPrice.grid(row=6,column=1,pady=2)
+textPrice.grid(row=7,column=1,pady=2)
 
 button1=ttk.Button(window,text='Reload Data',command=reloadData)
-button1.grid(row=7,column=0,columnspan=3,pady=10)
+button1.grid(row=8,column=0,columnspan=3,pady=10)
 
 #load text file data and get the list Of TourPackages
 listOfTourPackages=loadData(fileName)

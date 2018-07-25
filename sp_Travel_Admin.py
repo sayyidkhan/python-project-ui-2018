@@ -14,11 +14,12 @@ fileName_txt ="tourlist.txt"
 ### Class TourPackage ###
 #########################
 class TourPackage:
-    def __init__(self,name,destination,duration,period,price):
+    def __init__(self,name,destination,duration,startDate,endDate,price):
         self.__name=name
         self.__destination=destination
         self.__duration=duration
-        self.__period=period
+        self.__startDate=startDate
+        self.__endDate=endDate
         self.__price=price
     def getName(self):
         return self.__name
@@ -32,10 +33,14 @@ class TourPackage:
         return self.__duration
     def setDuration(self,duration):
         self.__duration=duration
-    def getPeriod(self):
-        return self.__period
-    def setPeriod(self,period):
-        self.__period=period
+    def getstartDate(self):
+        return self.__startDate
+    def setstartDate(self,startDate):
+        self.__startDate = startDate
+    def getendDate(self):
+        return self.__endDate
+    def setendDate(self,period):
+        self.__endDate = endDate
     def getPrice(self):
         return self.__price
     def setPrice(self,price):
@@ -49,22 +54,23 @@ class TourPackage:
 ######################
 #load data from some supplied filename
 def loadData(fileName):
-	#Load Data to GUI
-	file=open(fileName_txt,'r')
-	lines=file.readlines()
-	tourLists=[]
-	for eachLine in lines:
-		eachLine=eachLine.replace("\n","")
-		cols=eachLine.split("|")
-		name=cols[0]
-		destination=cols[1]
-		duration=cols[2]
-		period=cols[3]
-		price=cols[4]
-		tourlist=TourPackage(name,destination,duration,period,price)
-		tourLists.append(tourlist)
-	file.close()
-	return tourLists
+    #Load Data to GUI
+    file=open(fileName_txt,'r')
+    lines=file.readlines()
+    tourLists=[]
+    for eachLine in lines:
+        eachLine=eachLine.replace("\n","")
+        cols=eachLine.split("|")
+        name=cols[0]
+        destination=cols[1]
+        duration=cols[2]
+        startDate = cols[3]
+        endDate=cols[4]
+        price=cols[5]
+        tourlist=TourPackage(name,destination,duration,startDate,endDate,price)
+        tourLists.append(tourlist)
+    file.close()
+    return tourLists
 
 #load text file data and get the list Of TourPackages
 listOfTourPackages = loadData(fileName_txt)
@@ -75,26 +81,26 @@ listOfTourPackages = loadData(fileName_txt)
 #####################
 def initDatabase():
     db=sqlite3.connect('sp_Travel_Admin_Database.db')
-    sql="create table travel(name text primary key,destination text,duration text,period text,price real)"
+    sql="create table travel(name text primary key,destination text,duration text,start_date text,end_date text,price real)"
     db.execute(sql)
     for tp in listOfTourPackages:
-        sql="insert into travel(name,destination,duration,period,price) values('"+tp.getName()+"','"+tp.getDestination()+"','"+tp.getDuration()+"','"+tp.getPeriod()+"','"+tp.getPrice()+"')"
+        sql="insert into travel(name,destination,duration,start_date,end_date,price) values('"+tp.getName()+"','"+tp.getDestination()+"','"+tp.getDuration()+"','"+tp.getstartDate()+"','"+tp.getendDate()+"','"+tp.getPrice()+"')"
         db.execute(sql)
     db.commit()
     db.close()
     messagebox.showinfo("DataBase Update - Success","Database initialized")
 
-def insertData(name,destination,duration,period,price):
+def insertData(name,destination,duration,startDate,endDate,price):
     db=sqlite3.connect('sp_Travel_Admin_Database.db')
-    sql="insert into travel(name,destination,duration,period,price) values(?,?,?,?,?)"
-    db.execute(sql,(name,destination,duration,period,price))
+    sql="insert into travel(name,destination,duration,start_date,end_date,price) values(?,?,?,?,?,?)"
+    db.execute(sql,(name,destination,duration,startDate,endDate,price))
     db.commit()
     db.close()
 
-def updateData(name,destination,duration,period,price):
+def updateData(name,destination,duration,startDate,endDate,price):
     db=sqlite3.connect('sp_Travel_Admin_Database.db')
-    sql="update travel set name=?, destination=?, duration=?, period=?, price=? where name=?"
-    db.execute(sql,(name,destination,duration,period,price,name))
+    sql="update travel set name=?, destination=?, duration=?, start_date=?, end_date=?, price=? where name=?"
+    db.execute(sql,(name,destination,duration,startDate,endDate,price,name))
     db.commit()
     db.close()
 
@@ -126,7 +132,7 @@ def readData_allData():
     rows=db.execute(sql)
     list_checkData_WithName = []
     for data in rows:
-        attributes = [data['name'],data['destination'],data['duration'],data['period'],data['price']]
+        attributes = [data['name'],data['destination'],data['duration'],data['start_date'],data['end_date'],data['price']]
         list_checkData_WithName.append(attributes)
     db.close()
     return list_checkData_WithName
@@ -142,18 +148,34 @@ if not os.path.exists('sp_Travel_Admin_Database.db'): #cannot find file sp_Trave
 
 ### GUI Functions ###
 #####################
+#validate_number
+def is_number(number_float):
+  try:
+    float(number_float)
+    return True
+  except ValueError:
+    return False
+    
 #insert_Button_message_box_info
 def insert_Button():
     name = txtName.get()
     destination = txtDestination.get()
     duration = txtDuration.get()
-    period = txtPeriod.get()
+    startDate = txtstartDate.get()
+    endDate = txtendDate.get()
     price = txtPrice.get()
-    if name != "" and destination != "" and duration != "" and period != "" and price != "":
-      insertData(name,destination,duration,period,price)
-      messagebox.showinfo("DataBase Update - Success","Added New Database Entry")
+    if name != "" and destination != "" and duration != "" and startDate != "" and endDate != "" and price != "":
+      if is_number(price) == True:
+        print("Database Inserted:", name,destination,duration,startDate,endDate,price)
+        insertData(name,destination,duration,startDate,endDate,price)
+        messagebox.showinfo("DataBase Update - Success","Added New Database Entry")
+      else:
+        messagebox.showinfo("DataBase Update - Failed","Incomplete Entry, price is not a number")
     else:
-      messagebox.showinfo("DataBase Update - Failed","Incomplete Entry, Please complete all data entry")
+      if is_number(price) == False:
+        messagebox.showinfo("DataBase Update - Failed","Incomplete Entry, price is not a number")
+      else:
+        messagebox.showinfo("DataBase Update - Failed","Incomplete Entry, Please complete all data entry")
 
 #delete_Button_message_box_info
 def delete_Button():
@@ -161,10 +183,12 @@ def delete_Button():
     txtName.set("")
     txtDestination.set("")
     txtDuration.set("")
-    txtPeriod.set("")
+    txtstartDate.set("")
+    txtendDate.set("")
     txtPrice.set("")
     my_list = checkData_WithName()
     if name in my_list:
+        print("Database Deleted:", name)
         deleteData(name)
         messagebox.showinfo("DataBase Update - Success",  name + ", have been successfully deleted")
     elif name == "":
@@ -184,12 +208,13 @@ def search_Button():
         for package in all_packages:
             ### if name in package, will print out the data ###
             if name in package:
-                print(package)
+                print("package:", package)
                 txtName.set(package[0])
                 txtDestination.set(package[1])
                 txtDuration.set(package[2])
-                txtPeriod.set(package[3])
-                txtPrice.set(package[4])
+                txtstartDate.set(package[3])
+                txtendDate.set(package[4])
+                txtPrice.set(package[5])
         messagebox.showinfo("DataBase Search - Success",  name + ", have been successfully displayed")
     elif name == "":
         messagebox.showinfo("DataBase Search - Null",  "no data selected")
@@ -201,20 +226,24 @@ def update_Button():
     name = txtName.get()
     destination = txtDestination.get()
     duration = txtDuration.get()
-    period = txtPeriod.get()
+    startDate = txtstartDate.get()
+    endDate = txtendDate.get()
     price = txtPrice.get()
-    if name != "" and destination != "" and duration != "" and period != "" and price != "":
-        updateData(name,destination,duration,period,price)
+    if name != "" and destination != "" and duration != "" and startDate != "" and endDate != "" and price != "":
+        print("Database Updated:", name,destination,duration,startDate,endDate,price)
+        updateData(name,destination,duration,startDate,endDate,price)
         messagebox.showinfo("DataBase Update - Success",  name + ", have been successfully updated")
     else:
         messagebox.showinfo("DataBase Update - Failed",  "One of the fields are empty")
 
 #clear text in textboxes
 def clear_Button():
+    print("clear")
     txtName.set("")
     txtDestination.set("")
     txtDuration.set("")
-    txtPeriod.set("")
+    txtstartDate.set("")
+    txtendDate.set("")
     txtPrice.set("")
 #####################
 ### GUI Functions ###
@@ -253,35 +282,42 @@ txtDuration = StringVar()
 textDuration = ttk.Entry(window,textvariable=txtDuration)
 textDuration.grid(row=4,column=1,pady=2)
 
-### label Period ###
-labelPeriod = ttk.Label(window,text="Period",padding=2)
-labelPeriod.grid(row=5,column=0,sticky=tk.W)
-txtPeriod = StringVar()
-textPeriod = ttk.Entry(window,textvariable=txtPeriod)
-textPeriod.grid(row=5,column=1,pady=2)
+### start date Period ###
+labelstartDate = ttk.Label(window,text="Start Date",padding=2)
+labelstartDate.grid(row=5,column=0,sticky=tk.W)
+txtstartDate = StringVar()
+textstartDate = ttk.Entry(window,textvariable=txtstartDate)
+textstartDate.grid(row=5,column=1,pady=2)
+
+### end date Period ###
+labelendDate = ttk.Label(window,text="End Date",padding=2)
+labelendDate.grid(row=6,column=0,sticky=tk.W)
+txtendDate = StringVar()
+textendDate = ttk.Entry(window,textvariable=txtendDate)
+textendDate.grid(row=6,column=1,pady=2)
 
 ### label Price ###
 labelPrice = ttk.Label(window,text="Price",padding=2)
-labelPrice.grid(row=6,column=0,sticky=tk.W)
+labelPrice.grid(row=7,column=0,sticky=tk.W)
 txtPrice = StringVar()
 textPrice = ttk.Entry(window,textvariable=txtPrice)
-textPrice.grid(row=6,column=1,pady=2)
+textPrice.grid(row=7,column=1,pady=2)
 
 ### Button insert Data ###
 button1=ttk.Button(window,text='Insert',command= insert_Button)
-button1.grid(row=7,column=1,columnspan=3,pady=10)
+button1.grid(row=8,column=1,columnspan=3,pady=10)
 ### Button Delete Data ###
 button2=ttk.Button(window,text='Delete',command= delete_Button)
-button2.grid(row=7,column=2,columnspan=3,pady=10)
+button2.grid(row=8,column=2,columnspan=3,pady=10)
 ### Button update Data ###
 button2=ttk.Button(window,text='Search',command= search_Button)
-button2.grid(row=8,column=1,columnspan=3,pady=10)
+button2.grid(row=9,column=1,columnspan=3,pady=10)
 ### Button update Data ###
 button2=ttk.Button(window,text='Update',command= update_Button)
-button2.grid(row=8,column=2,columnspan=3,pady=10)
+button2.grid(row=9,column=2,columnspan=3,pady=10)
 ### Button clear Data ###
 button2=ttk.Button(window,text='Clear',command= clear_Button)
-button2.grid(row=9,column=2,columnspan=3,pady=10)
+button2.grid(row=10,column=2,columnspan=3,pady=10)
 ### GUI ###
 ###########
 
