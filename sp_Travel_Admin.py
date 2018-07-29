@@ -8,19 +8,23 @@ from tkinter import messagebox
 import sqlite3
 import os.path
 ### SQL ###
+### PIL ###
+from PIL import Image, ImageTk
+### PIL ###
 
 fileName_txt ="tourlist.txt"
 
 ### Class TourPackage ###
 #########################
 class TourPackage:
-    def __init__(self,name,destination,duration,startDate,endDate,price):
+    def __init__(self,name,destination,duration,startDate,endDate,price,image):
         self.__name=name
         self.__destination=destination
         self.__duration=duration
         self.__startDate=startDate
         self.__endDate=endDate
         self.__price=price
+        self.__image = image
     def getName(self):
         return self.__name
     def setName(self,name):
@@ -47,6 +51,8 @@ class TourPackage:
         self.__price = price
     def getPriceWithGST(self):
         return(self.__price * 1.07)
+    def getImage_txtFile(self):
+        return self.__image
 #########################
 ### Class TourPackage ###
 
@@ -67,7 +73,8 @@ def loadData(fileName):
         startDate = cols[3]
         endDate=cols[4]
         price=cols[5]
-        tourlist=TourPackage(name,destination,duration,startDate,endDate,price)
+        image_text_file =cols[6]
+        tourlist=TourPackage(name,destination,duration,startDate,endDate,price,image_text_file)
         tourLists.append(tourlist)
     file.close()
     return tourLists
@@ -81,26 +88,26 @@ listOfTourPackages = loadData(fileName_txt)
 #####################
 def initDatabase():
     db=sqlite3.connect('sp_Travel_Admin_Database.db')
-    sql="create table travel(name text primary key,destination text,duration text,start_date text,end_date text,price real)"
+    sql="create table travel(name text primary key,destination text,duration text,start_date text,end_date text,price real,image_text_file text)"
     db.execute(sql)
     for tp in listOfTourPackages:
-        sql="insert into travel(name,destination,duration,start_date,end_date,price) values('"+tp.getName()+"','"+tp.getDestination()+"','"+tp.getDuration()+"','"+tp.getstartDate()+"','"+tp.getendDate()+"','"+tp.getPrice()+"')"
+        sql="insert into travel(name,destination,duration,start_date,end_date,price,image_text_file) values('"+tp.getName()+"','"+tp.getDestination()+"','"+tp.getDuration()+"','"+tp.getstartDate()+"','"+tp.getendDate()+"','"+tp.getPrice()+"','"+tp.getImage_txtFile()+"')"
         db.execute(sql)
     db.commit()
     db.close()
     messagebox.showinfo("DataBase Update - Success","Database initialized")
 
-def insertData(name,destination,duration,startDate,endDate,price):
+def insertData(name,destination,duration,startDate,endDate,price,imageTextFile):
     db=sqlite3.connect('sp_Travel_Admin_Database.db')
-    sql="insert into travel(name,destination,duration,start_date,end_date,price) values(?,?,?,?,?,?)"
-    db.execute(sql,(name,destination,duration,startDate,endDate,price))
+    sql="insert into travel(name,destination,duration,start_date,end_date,price,image_text_file) values(?,?,?,?,?,?,?)"
+    db.execute(sql,(name,destination,duration,startDate,endDate,price,imageTextFile))
     db.commit()
     db.close()
 
-def updateData(name,destination,duration,startDate,endDate,price):
+def updateData(name,destination,duration,startDate,endDate,price,imageTextFile):
     db=sqlite3.connect('sp_Travel_Admin_Database.db')
-    sql="update travel set name=?, destination=?, duration=?, start_date=?, end_date=?, price=? where name=?"
-    db.execute(sql,(name,destination,duration,startDate,endDate,price,name))
+    sql="update travel set name=?, destination=?, duration=?, start_date=?, end_date=?, price=?, imageTextFile=? where name=?"
+    db.execute(sql,(name,destination,duration,startDate,endDate,price,name,imageTextFile))
     db.commit()
     db.close()
 
@@ -124,7 +131,29 @@ def checkData_WithName():
     db.close()
     return list_checkData_WithName
 
-#
+def checkData_WithPackageName():
+    db=sqlite3.connect('sp_Travel_Admin_Database.db')
+    sql="select * from travel"
+    db.row_factory = sqlite3.Row
+    rows=db.execute(sql)
+    list_checkData_WithPackageName = []
+    for data in rows:
+        list_checkData_WithPackageName.append(data['name'])
+    db.close()
+    return list_checkData_WithPackageName
+
+def checkData_Withimage_text_file():
+    db=sqlite3.connect('sp_Travel_Admin_Database.db')
+    sql="select * from travel"
+    db.row_factory = sqlite3.Row
+    rows=db.execute(sql)
+    list_checkData_Withimage_text_file = []
+    for data in rows:
+        list_checkData_Withimage_text_file.append(data['image_text_file'])
+    db.close()
+    return list_checkData_Withimage_text_file
+
+#read all data from the database
 def readData_allData():
     db=sqlite3.connect('sp_Travel_Admin_Database.db')
     sql="select * from travel"
@@ -132,10 +161,14 @@ def readData_allData():
     rows=db.execute(sql)
     list_checkData_WithName = []
     for data in rows:
-        attributes = [data['name'],data['destination'],data['duration'],data['start_date'],data['end_date'],data['price']]
+        attributes = [data['name'],data['destination'],data['duration'],data['start_date'],data['end_date'],data['price'],data['image_text_file']]
         list_checkData_WithName.append(attributes)
     db.close()
     return list_checkData_WithName
+
+#image_fileName
+
+
 #####################
 ### SQL Functions ###
 
@@ -155,7 +188,7 @@ def is_number(number_float):
     return True
   except ValueError:
     return False
-    
+
 #insert_Button_message_box_info
 def insert_Button():
     name = txtName.get()
@@ -164,7 +197,8 @@ def insert_Button():
     startDate = txtstartDate.get()
     endDate = txtendDate.get()
     price = txtPrice.get()
-    if name != "" and destination != "" and duration != "" and startDate != "" and endDate != "" and price != "":
+    image = txtImage.get()
+    if name != "" and destination != "" and duration != "" and startDate != "" and endDate != "" and price != "" and image != "" :
       if is_number(price) == True:
         print("Database Inserted:", name,destination,duration,startDate,endDate,price)
         insertData(name,destination,duration,startDate,endDate,price)
@@ -197,6 +231,24 @@ def delete_Button():
         print (name,"not in my list")
         messagebox.showinfo("DataBase Update - Failed",  name + ", is not a valid entry in the database.")
 
+def change_Pic():
+    checkimage = checkData_Withimage_text_file()
+    image = txtImage.get()
+    if image in checkimage:
+        value = "images/" + image # returns images/<image name.jpg>
+        return value
+    else:
+        value = "images/no-image-selected.jpg" # returns "images/no-image-selected.jpg"
+        return value
+
+def onClick_change_Pic():
+    path = change_Pic()
+    open_path = Image.open(path)
+    final_path_resized = open_path.resize((180, 180), Image.ANTIALIAS)
+    img2 = ImageTk.PhotoImage(final_path_resized)
+    panel.configure(image = img2)
+    panel.image = img2
+
 #search_Button: search for the package, and prints the package out
 def search_Button():
     name = txtName.get()
@@ -215,11 +267,14 @@ def search_Button():
                 txtstartDate.set(package[3])
                 txtendDate.set(package[4])
                 txtPrice.set(package[5])
+                txtImage.set(package[6])
+                onClick_change_Pic() ### displayImage file ###
         messagebox.showinfo("DataBase Search - Success",  name + ", have been successfully displayed")
     elif name == "":
         messagebox.showinfo("DataBase Search - Null",  "no data selected")
     else:
         messagebox.showinfo("DataBase Search - Failed", name + ", is not available in the database")
+
 
 #update_Button: update the package, and prints the package out
 def update_Button():
@@ -229,9 +284,10 @@ def update_Button():
     startDate = txtstartDate.get()
     endDate = txtendDate.get()
     price = txtPrice.get()
-    if name != "" and destination != "" and duration != "" and startDate != "" and endDate != "" and price != "":
-        print("Database Updated:", name,destination,duration,startDate,endDate,price)
-        updateData(name,destination,duration,startDate,endDate,price)
+    image = txtImage.get()
+    if name != "" and destination != "" and duration != "" and startDate != "" and endDate != "" and price != "" and image != "":
+        print("Database Updated:", name,destination,duration,startDate,endDate,price,image)
+        updateData(name,destination,duration,startDate,endDate,price,image)
         messagebox.showinfo("DataBase Update - Success",  name + ", have been successfully updated")
     else:
         messagebox.showinfo("DataBase Update - Failed",  "One of the fields are empty")
@@ -245,6 +301,7 @@ def clear_Button():
     txtstartDate.set("")
     txtendDate.set("")
     txtPrice.set("")
+    txtImage.set("")
 #####################
 ### GUI Functions ###
 
@@ -252,7 +309,7 @@ def clear_Button():
 ###########
 window = tk.Tk()
 window.title("Sp Travel Admin")
-window.geometry("550x550") #You want the size of the app to be 500x500
+window.geometry("450x650") #You want the size of the app to be 500x500
 window.resizable(0, 0) #Don't allow resizing in the x or y direction
 #
 ### label App Name ###
@@ -303,21 +360,43 @@ txtPrice = StringVar()
 textPrice = ttk.Entry(window,textvariable=txtPrice)
 textPrice.grid(row=7,column=1,pady=2)
 
+### label text_image_name ###
+labelImage = ttk.Label(window,text="File Name(Image)",padding=2)
+labelImage.grid(row=8,column=0,sticky=tk.W)
+txtImage = StringVar()
+textImage = ttk.Entry(window,textvariable=txtImage)
+textImage.grid(row=8,column=1,pady=2)
+
+### tkinter photo ###
+path = change_Pic()
+open_path = Image.open(path)
+final_path_resized = open_path.resize((180, 180), Image.ANTIALIAS)
+img = ImageTk.PhotoImage(final_path_resized)
+panel = tk.Label(window, image = img)
+panel.image = img
+panel.place(x = 15, y = 300, height = 180, width = 180)
+### tkinter photo ###
+
 ### Button insert Data ###
 button1=ttk.Button(window,text='Insert',command= insert_Button)
-button1.grid(row=8,column=1,columnspan=3,pady=10)
+button1.grid(row=10,column=1,columnspan=3,pady=10)
 ### Button Delete Data ###
 button2=ttk.Button(window,text='Delete',command= delete_Button)
-button2.grid(row=8,column=2,columnspan=3,pady=10)
-### Button update Data ###
-button2=ttk.Button(window,text='Search',command= search_Button)
-button2.grid(row=9,column=1,columnspan=3,pady=10)
-### Button update Data ###
-button2=ttk.Button(window,text='Update',command= update_Button)
-button2.grid(row=9,column=2,columnspan=3,pady=10)
-### Button clear Data ###
-button2=ttk.Button(window,text='Clear',command= clear_Button)
 button2.grid(row=10,column=2,columnspan=3,pady=10)
+### Button update Data ###
+button3=ttk.Button(window,text='Search',command= search_Button)
+button3.grid(row=11,column=1,columnspan=3,pady=10)
+### Button update Data ###
+button4=ttk.Button(window,text='Update',command= update_Button)
+button4.grid(row=11,column=2,columnspan=3,pady=10)
+### Button clear Data ###
+button5=ttk.Button(window,text='Clear',command= clear_Button)
+button5.grid(row=12,column=2,columnspan=3,pady=10)
+
+'''
+label2 = ttk.Label(window,text="Start Date",padding=2)
+label2.place(x= 20,y = 20)
+'''
 ### GUI ###
 ###########
 
