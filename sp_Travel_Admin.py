@@ -97,17 +97,17 @@ def initDatabase():
     db.close()
     messagebox.showinfo("DataBase Update - Success","Database initialized")
 
-def insertData(name,destination,duration,startDate,endDate,price,imageTextFile):
+def insertData(name,destination,duration,startDate,endDate,price,image_text_file):
     db=sqlite3.connect('sp_Travel_Admin_Database.db')
     sql="insert into travel(name,destination,duration,start_date,end_date,price,image_text_file) values(?,?,?,?,?,?,?)"
-    db.execute(sql,(name,destination,duration,startDate,endDate,price,imageTextFile))
+    db.execute(sql,(name,destination,duration,startDate,endDate,price,image_text_file))
     db.commit()
     db.close()
 
-def updateData(name,destination,duration,startDate,endDate,price,imageTextFile):
+def updateData(name,destination,duration,startDate,endDate,price,image_text_file):
     db=sqlite3.connect('sp_Travel_Admin_Database.db')
-    sql="update travel set name=?, destination=?, duration=?, start_date=?, end_date=?, price=?, imageTextFile=? where name=?"
-    db.execute(sql,(name,destination,duration,startDate,endDate,price,name,imageTextFile))
+    sql="update travel set name=?, destination=?, duration=?, start_date=?, end_date=?, price=?, image_text_file=? where name=?"
+    db.execute(sql,(name,destination,duration,startDate,endDate,price,image_text_file,name))
     db.commit()
     db.close()
 
@@ -179,6 +179,41 @@ if not os.path.exists('sp_Travel_Admin_Database.db'): #cannot find file sp_Trave
 ################################################
 ### create a database when it does not exist ###
 
+### PhotoImage Functions ###
+############################
+
+#return the file name
+def change_Pic():
+    checkimage = checkData_Withimage_text_file()
+    image = txtImage.get()
+    if image in checkimage:
+        value = "images/" + image # returns images/<image name.jpg>
+        return value
+    else:
+        value = "images/no-image-selected.jpg" # returns "images/no-image-selected.jpg"
+        return value
+
+#changes the picture state of PhotoImage
+def onClick_Change_Pic():
+    path = change_Pic()
+    open_path = Image.open(path)
+    final_path_resized = open_path.resize((180, 180), Image.ANTIALIAS)
+    img2 = ImageTk.PhotoImage(final_path_resized)
+    panel.configure(image = img2)
+    panel.image = img2
+
+#catch error for FileNotFoundError
+def errorFile_onClick_Change_Pic():
+    try:
+        onClick_Change_Pic() ### update displayImage file ###
+    except (FileNotFoundError):
+        print("FileNotFoundError have been triggered by system")
+        pass ### update file not found error ###
+
+
+############################
+### PhotoImage Functions ###
+
 ### GUI Functions ###
 #####################
 #validate_number
@@ -200,8 +235,8 @@ def insert_Button():
     image = txtImage.get()
     if name != "" and destination != "" and duration != "" and startDate != "" and endDate != "" and price != "" and image != "" :
       if is_number(price) == True:
-        print("Database Inserted:", name,destination,duration,startDate,endDate,price)
-        insertData(name,destination,duration,startDate,endDate,price)
+        print("Database Inserted:", name,destination,duration,startDate,endDate,price,image)
+        insertData(name,destination,duration,startDate,endDate,price,image)
         messagebox.showinfo("DataBase Update - Success","Added New Database Entry")
       else:
         messagebox.showinfo("DataBase Update - Failed","Incomplete Entry, price is not a number")
@@ -220,6 +255,7 @@ def delete_Button():
     txtstartDate.set("")
     txtendDate.set("")
     txtPrice.set("")
+    txtImage.set("")
     my_list = checkData_WithName()
     if name in my_list:
         print("Database Deleted:", name)
@@ -230,24 +266,6 @@ def delete_Button():
     else:
         print (name,"not in my list")
         messagebox.showinfo("DataBase Update - Failed",  name + ", is not a valid entry in the database.")
-
-def change_Pic():
-    checkimage = checkData_Withimage_text_file()
-    image = txtImage.get()
-    if image in checkimage:
-        value = "images/" + image # returns images/<image name.jpg>
-        return value
-    else:
-        value = "images/no-image-selected.jpg" # returns "images/no-image-selected.jpg"
-        return value
-
-def onClick_change_Pic():
-    path = change_Pic()
-    open_path = Image.open(path)
-    final_path_resized = open_path.resize((180, 180), Image.ANTIALIAS)
-    img2 = ImageTk.PhotoImage(final_path_resized)
-    panel.configure(image = img2)
-    panel.image = img2
 
 #search_Button: search for the package, and prints the package out
 def search_Button():
@@ -268,11 +286,19 @@ def search_Button():
                 txtendDate.set(package[4])
                 txtPrice.set(package[5])
                 txtImage.set(package[6])
-                onClick_change_Pic() ### displayImage file ###
+                try:
+                    errorFile_onClick_Change_Pic() ### update displayImage file ###
+                except (FileNotFoundError):
+                    print("FileNotFoundError have been triggered by system")
+                    pass ### update file not found error file ###
         messagebox.showinfo("DataBase Search - Success",  name + ", have been successfully displayed")
     elif name == "":
+        clear_Button()
+        errorFile_onClick_Change_Pic() ### update displayImage file ###
         messagebox.showinfo("DataBase Search - Null",  "no data selected")
     else:
+        clear_Button()
+        errorFile_onClick_Change_Pic() ### update displayImage file ###
         messagebox.showinfo("DataBase Search - Failed", name + ", is not available in the database")
 
 
@@ -302,6 +328,7 @@ def clear_Button():
     txtendDate.set("")
     txtPrice.set("")
     txtImage.set("")
+    errorFile_onClick_Change_Pic() ### update displayImage file ###
 #####################
 ### GUI Functions ###
 
@@ -368,13 +395,18 @@ textImage = ttk.Entry(window,textvariable=txtImage)
 textImage.grid(row=8,column=1,pady=2)
 
 ### tkinter photo ###
-path = change_Pic()
-open_path = Image.open(path)
-final_path_resized = open_path.resize((180, 180), Image.ANTIALIAS)
-img = ImageTk.PhotoImage(final_path_resized)
-panel = tk.Label(window, image = img)
-panel.image = img
-panel.place(x = 15, y = 300, height = 180, width = 180)
+
+try:
+    path = change_Pic()
+    open_path = Image.open(path)
+    final_path_resized = open_path.resize((180, 180), Image.ANTIALIAS)
+    img = ImageTk.PhotoImage(final_path_resized)
+    panel = ttk.Label(window, image = img)
+    panel.image = img
+    panel.place(x = 15, y = 300, height = 180, width = 180)
+except:
+    pass
+
 ### tkinter photo ###
 
 ### Button insert Data ###
