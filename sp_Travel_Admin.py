@@ -86,16 +86,7 @@ listOfTourPackages = loadData(fileName_txt)
 
 ### SQL Functions ###
 #####################
-def initDatabase():
-    db=sqlite3.connect('sp_Travel_Admin_Database.db')
-    sql="create table travel(name text primary key,destination text,duration text,start_date text,end_date text,price real,image_text_file text)"
-    db.execute(sql)
-    for tp in listOfTourPackages:
-        sql="insert into travel(name,destination,duration,start_date,end_date,price,image_text_file) values('"+tp.getName()+"','"+tp.getDestination()+"','"+tp.getDuration()+"','"+tp.getstartDate()+"','"+tp.getendDate()+"','"+tp.getPrice()+"','"+tp.getImage_txtFile()+"')"
-        db.execute(sql)
-    db.commit()
-    db.close()
-    messagebox.showinfo("DataBase Update - Success","Database initialized")
+
 
 def insertData(name,destination,duration,startDate,endDate,price,image_text_file):
     db=sqlite3.connect('sp_Travel_Admin_Database.db')
@@ -172,12 +163,7 @@ def readData_allData():
 #####################
 ### SQL Functions ###
 
-### create a database when it does not exist ###
-################################################
-if not os.path.exists('sp_Travel_Admin_Database.db'): #cannot find file sp_Travel_Admin_Database.db
-    initDatabase()
-################################################
-### create a database when it does not exist ###
+
 
 ### PhotoImage Functions ###
 ############################
@@ -339,6 +325,25 @@ window.title("Sp Travel Admin")
 window.geometry("450x650") #You want the size of the app to be 500x500
 window.resizable(0, 0) #Don't allow resizing in the x or y direction
 #
+
+### create a database when it does not exist ###
+################################################
+if not os.path.exists('sp_Travel_Admin_Database.db'): #cannot find file sp_Travel_Admin_Database.db
+    messagebox.showinfo("DataBase Update - Success","Database initialized")
+    def initDatabase():
+        db=sqlite3.connect('sp_Travel_Admin_Database.db')
+        sql="create table travel(name text primary key,destination text,duration text,start_date text,end_date text,price real,image_text_file text)"
+        db.execute(sql)
+        for tp in listOfTourPackages:
+            sql="insert into travel(name,destination,duration,start_date,end_date,price,image_text_file) values('"+tp.getName()+"','"+tp.getDestination()+"','"+tp.getDuration()+"','"+tp.getstartDate()+"','"+tp.getendDate()+"','"+tp.getPrice()+"','"+tp.getImage_txtFile()+"')"
+            db.execute(sql)
+        db.commit()
+        db.close()
+
+    initDatabase()
+################################################
+### create a database when it does not exist ###
+
 ### label App Name ###
 labelAppName = ttk.Label(window , text="SP Travel App" ,padding=2)
 labelAppName.config(font=("Arial", 40))
