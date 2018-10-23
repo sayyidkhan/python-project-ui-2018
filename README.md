@@ -27,7 +27,7 @@ There are two programs in this files.
 This file is to view what are the **_existing travel packages_**.
 
 **Screen 1: Landing page of the Application**
-
+>
 ![screen shot 2018-10-23 at 10 03 34 pm](https://user-images.githubusercontent.com/22993048/47366105-88899780-d70f-11e8-8e4f-317f085c2fdd.png)
 
 **Screen 2: Loading/refresh the database**
