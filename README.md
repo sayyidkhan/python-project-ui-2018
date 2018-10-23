@@ -9,12 +9,12 @@ i used the sqlite as a database.there is also an image processing tool where the
 travel site.
 
 ## libraries required:
-# tkinter
+###### tkinter
 * tkinter
 * tkinter.ttk
-# sqlite3
+###### sqlite3
 * sqlite3
-# pil library
+###### pil library
 * PIL 
 
 libraries which need to be installed before the program can be run.
@@ -26,4 +26,5 @@ There are two programs in this files.
 This first file can be started by starting "spTravel.py".
 This file is to view what are the available travel sites that are available in the database.
 
+**Screen 1: Landing page of the Application**
 ![screen shot 2018-10-23 at 10 03 34 pm](https://user-images.githubusercontent.com/22993048/47366105-88899780-d70f-11e8-8e4f-317f085c2fdd.png)
