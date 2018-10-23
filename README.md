@@ -9,12 +9,12 @@ i used the sqlite as a database.there is also an image processing tool where the
 travel site.
 
 ## libraries required:
--- tkinter --
+# tkinter
 * tkinter
 * tkinter.ttk
--- sqlite3 --
+# sqlite3
 * sqlite3
--- pil library --
+# pil library
 * PIL 
 
 libraries which need to be installed before the program can be run.
