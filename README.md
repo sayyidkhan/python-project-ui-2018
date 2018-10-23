@@ -23,7 +23,7 @@ libraries which need to be installed before the program can be run.
 
 There are two programs in this files.
 
-###### The first file, view travel package
+## The first file, view travel package
 **_This first file_** can be started by starting **_"spTravel.py"_**.
 This file is to view what are the **_existing travel packages_**.
 
