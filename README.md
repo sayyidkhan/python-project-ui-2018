@@ -46,3 +46,4 @@ This file is to view what are the **_existing travel packages_**.
 This file is to perform CRUD(create,read,update,delete) on the application.
 
 **Screen 1: Landing page of the Application**
+> ![screen shot 2018-10-23 at 10 25 02 pm](https://user-images.githubusercontent.com/22993048/47367581-8aa12580-d712-11e8-8769-b1b0233203c0.png)
