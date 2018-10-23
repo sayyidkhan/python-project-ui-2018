@@ -24,6 +24,7 @@ libraries which need to be installed before the program can be run.
 There are two programs in this files.
 
 ###### The first file, view travel package
+
 **_This first file_** can be started by starting **_"spTravel.py"_**.
 This file is to view what are the **_existing travel packages_**.
 
@@ -39,3 +40,9 @@ This file is to view what are the **_existing travel packages_**.
 > select one of the travel package to view the travel package.
 ![screen shot 2018-10-23 at 10 16 51 pm](https://user-images.githubusercontent.com/22993048/47367126-a3f5a200-d711-11e8-9951-9cac8f900b41.png)
 
+###### The second file, perform CRUD operations to the travel package.
+
+**_This second file_** can be started by starting **_"sp_Travel_Admin.py"_**.
+This file is to perform CRUD(create,read,update,delete) on the application.
+
+**Screen 1: Landing page of the Application**
