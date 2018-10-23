@@ -33,3 +33,6 @@ This file is to view what are the **_existing travel packages_**.
 **Screen 2: Loading/refresh the database**
 > if the database is being updated/added/removed, we can click reload data to update the database.
 ![screen shot 2018-10-23 at 10 11 59 pm](https://user-images.githubusercontent.com/22993048/47366653-b7ecd400-d710-11e8-9451-09f64310d810.png)
+
+**Screen 2: Load a travel package**
+> select one of the travel package to view the travel package.
