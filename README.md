@@ -24,7 +24,7 @@ libraries which need to be installed before the program can be run.
 There are two programs in this files.
 
 This first file can be started by starting "spTravel.py".
-This file is to view what are the available travel sites that are available in the database.
+This file is to view what are the * **existing travel packages** *.
 
 **Screen 1: Landing page of the Application**
 
