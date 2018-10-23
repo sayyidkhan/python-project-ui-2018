@@ -62,3 +62,8 @@ This file is to perform CRUD(create,read,update,delete) on the application.
 > user can update an travel package which is in the database
 ![screen shot 2018-10-23 at 10 37 54 pm](https://user-images.githubusercontent.com/22993048/47368512-5c244a00-d714-11e8-8e47-783dea96c7f3.png)
 ![screen shot 2018-10-23 at 10 38 06 pm](https://user-images.githubusercontent.com/22993048/47368515-5cbce080-d714-11e8-87b0-8e3cbb4d7ca1.png)
+
+**Screen 5: Update an existing travel Package**
+> user can delete a travel package which is in the database
+![screen shot 2018-10-23 at 10 40 33 pm](https://user-images.githubusercontent.com/22993048/47368730-bc1af080-d714-11e8-9f87-bb7eacc151c3.png)
+![screen shot 2018-10-23 at 10 40 48 pm](https://user-images.githubusercontent.com/22993048/47368731-bc1af080-d714-11e8-8b1f-9bf724d38bf8.png)
