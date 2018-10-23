@@ -49,7 +49,10 @@ This file is to perform CRUD(create,read,update,delete) on the application.
 > if there is no data in the database.db what the system will do is it will read from tourlist.txt to create a database from it.
 ![screen shot 2018-10-23 at 10 25 02 pm](https://user-images.githubusercontent.com/22993048/47367581-8aa12580-d712-11e8-8769-b1b0233203c0.png)
 
-**Screen 2: Landing page of the Application**
+**Screen 2: Create a new travel Package**
 > user can add new travel package into the database
 ![screen shot 2018-10-23 at 10 29 36 pm](https://user-images.githubusercontent.com/22993048/47368009-6eea4f00-d713-11e8-8865-247b12d4f603.png)
+
+**Screen 3: Read an existing travel Package**
+> user can search an travel package which is added into the database
 
